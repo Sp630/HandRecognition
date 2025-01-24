@@ -1,16 +1,16 @@
-# This is a sample Python script.
+import cv2
+import mediapipe
+import HandTrackingModule as htm
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+cap = cv2.VideoCapture(0)
+detector = htm.handDetector()
 
+while True:
+    success, img = cap.read()
+    img = detector.findHands(img)
+    lmList = detector.findPosition(img)
+    if len(lmList) != 0:
+        print(lmList[4])
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    cv2.imshow("Image", img)
+    cv2.waitKey(1)
