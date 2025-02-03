@@ -1,6 +1,6 @@
 import cv2
 import mediapipe
-import HandTrackingModule as htm
+from cvzone import HandTrackingModule as htm
 
 cap = cv2.VideoCapture(0)
 detector = htm.handDetector()
