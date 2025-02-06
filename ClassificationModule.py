@@ -3,11 +3,19 @@ from tensorflow.keras import models
 import cv2
 import numpy as np
 from tensorflow.python.keras.saving.save import load_model
+import threading
+
 
 
 class Classifier:
     def __init__(self, modelPath):
         self.modelPath = modelPath
+        self.result = None
+        self.lock = threading.Lock()
+    def multithreadPredict(self, img):
+        t1 = threading.Thread(target=self.getPrediction, args=(img, ))
+        t1.start()
+        print(self.result)
     def getPrediction(self, img):
         #img = cv2.imread(self.imgPath)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -17,4 +25,6 @@ class Classifier:
         classes = ["A", "B", "C"]
         model = load_model(self.modelPath)
         prediction = model.predict(img)
-        return prediction
+        self.result = 14
+        with self.lock:
+            self.result = prediction
