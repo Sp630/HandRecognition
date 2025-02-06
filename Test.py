@@ -7,15 +7,13 @@ import math
 import tensorflow
 from tensorboard import summary
 from tensorflow.keras.models import *
-
-
+import ClassificationModule
 
 cap = cv2.VideoCapture(0)
 detector = handDetector(maxHands=1)
 
-folder = "Data/BaseData/C"
 counter = 0
-
+classifier = ClassificationModule.Classifier("model1")
 while True:
     success, img = cap.read()
     data, img = detector.findHands(img)
@@ -43,6 +41,8 @@ while True:
             imgResizeShape = imgResize.shape
             wGap = math.ceil(((300-wCal) / 2))
             imgWhite[:, wGap:wCal+wGap] = imgResize
+            prediction = classifier.getPrediction(imgWhite)
+            print(prediction)
         else:
             k=imgSize/w
             hCal = math.ceil(k * h)
@@ -54,21 +54,7 @@ while True:
 
         cv2.imshow("WhiteImage", imgWhite)
 
-        model = load_model("model1")
-        model.summary()
-
-        toPredict = imgWhite / 255
-        img = np.expand_dims(imgWhite, axis=0)
-        classes = ["A", "B", "C"]
-
-        prediction = model.predict(img)
-
-        print(prediction)
 
     cv2.imshow("Image", img)
     key = cv2.waitKey(1)
-    if key == ord("s"):
-        counter += 1
-        cv2.imwrite(f"{folder}/Image_{time.time()}.jpg", imgWhite)
-        print(counter)
 

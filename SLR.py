@@ -6,7 +6,7 @@ from tensorflow.keras.models import *
 
 model = load_model("model1")
 model.summary()
-imgPath = "Data/BaseData/B/Image_1738704673.1160867.jpg"
+imgPath = "Data/BaseData/C/Image_1738721586.9495163.jpg"
 img = cv2.imread(imgPath)
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 

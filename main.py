@@ -1,9 +1,9 @@
 import cv2
 import mediapipe
-from cvzone import HandTrackingModule as htm
+from cvzone import ClassificationModule
 
 cap = cv2.VideoCapture(0)
-detector = htm.handDetector()
+classifier = ClassificationModule.Classifier
 
 while True:
     success, img = cap.read()
