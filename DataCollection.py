@@ -54,7 +54,7 @@ while True:
 
         cv2.imshow("WhiteImage", imgWhite)
 
-        model = load_model("model1")
+        model = load_model("Models/model1")
         model.summary()
 
         toPredict = imgWhite / 255

@@ -4,7 +4,7 @@ import tensorflow
 from tensorboard import summary
 from tensorflow.keras.models import *
 
-model = load_model("model1")
+model = load_model("Models/model1")
 model.summary()
 imgPath = "Data/BaseData/C/Image_1738721586.9495163.jpg"
 img = cv2.imread(imgPath)
