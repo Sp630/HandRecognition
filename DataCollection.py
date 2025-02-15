@@ -13,7 +13,7 @@ from tensorflow.keras.models import *
 cap = cv2.VideoCapture(0)
 detector = handDetector(maxHands=1)
 
-folder = "Data/BaseData/C"
+folder = "Data/Bulgarian/5"
 counter = 0
 
 while True:
@@ -54,16 +54,6 @@ while True:
 
         cv2.imshow("WhiteImage", imgWhite)
 
-        model = load_model("Models/model1")
-        model.summary()
-
-        toPredict = imgWhite / 255
-        img = np.expand_dims(imgWhite, axis=0)
-        classes = ["A", "B", "C"]
-
-        prediction = model.predict(img)
-
-        print(prediction)
 
     cv2.imshow("Image", img)
     key = cv2.waitKey(1)

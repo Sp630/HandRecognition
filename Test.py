@@ -53,7 +53,7 @@ while True:
     imgSize = 300
     if classifier.result is not None:
         prediction = classifier.result
-        classes = ["A", "B", "C"]
+        classes = ["А", "Б", "В", "Г", "Д"]
 
         print(classes[np.argmax(prediction)])
         pred = prediction

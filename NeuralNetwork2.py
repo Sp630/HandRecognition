@@ -13,7 +13,7 @@ train = ImageDataGenerator(rescale= 1/255)
 validation = ImageDataGenerator(rescale= 1/255)
 
 train_dataset = prep.image_dataset_from_directory(
-    directory="Data/BaseData",
+    directory="Data/Bulgarian",
     image_size=(300, 300),
     validation_split=0.2,
     subset= "training",
@@ -24,7 +24,7 @@ train_dataset = prep.image_dataset_from_directory(
 )
 
 test_dataset = prep.image_dataset_from_directory(
-    directory="Data/BaseData",
+    directory="Data/Bulgarian",
     image_size=(300, 300),
     validation_split=0.2,
     subset= "validation",
@@ -51,7 +51,7 @@ model = tf.keras.models.Sequential([
 
     Flatten(),
     Dense(128, activation=relu),
-    Dense(3, activation=softmax)
+    Dense(5, activation=softmax)
 
 ])
 
@@ -60,6 +60,6 @@ model.compile(loss= CategoricalCrossentropy(), optimizer = Adam(), metrics = ['a
 
 history = model.fit(train_dataset, epochs = 10, validation_data = test_dataset)
 
-model.save("Models/model2")
+model.save("Models/model3")
 print("banana")
 
