@@ -19,7 +19,7 @@ for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 #os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-
+#passtest
 cap = cv2.VideoCapture(0)
 detector = handDetector(maxHands=1)
 counter = 0
