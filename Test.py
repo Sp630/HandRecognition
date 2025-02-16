@@ -24,7 +24,7 @@ cap = cv2.VideoCapture(0)
 detector = handDetector(maxHands=1)
 counter = 0
 #Load the model; done at the beginning to prevent slow-downs in the loop
-classifier = ClassificationModule.Classifier("Models/model2")
+classifier = ClassificationModule.Classifier("Models/model4")
 
 globalImage = None
 classes = ["A", "B", "C"]
@@ -53,7 +53,7 @@ while True:
     imgSize = 300
     if classifier.result is not None:
         prediction = classifier.result
-        classes = ["А", "Б", "В", "Г", "Д"]
+        classes = ["А", "И'", "Б", "В", "Г", "Д", "Е", "Ж", "З", "И"]
 
         print(classes[np.argmax(prediction)])
         pred = prediction

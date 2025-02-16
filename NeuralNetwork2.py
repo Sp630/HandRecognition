@@ -51,7 +51,7 @@ model = tf.keras.models.Sequential([
 
     Flatten(),
     Dense(128, activation=relu),
-    Dense(5, activation=softmax)
+    Dense(10, activation=softmax)
 
 ])
 
@@ -60,6 +60,6 @@ model.compile(loss= CategoricalCrossentropy(), optimizer = Adam(), metrics = ['a
 
 history = model.fit(train_dataset, epochs = 10, validation_data = test_dataset)
 
-model.save("Models/model3")
+model.save("Models/model4")
 print("banana")
 

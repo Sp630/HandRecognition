@@ -13,7 +13,7 @@ from tensorflow.keras.models import *
 cap = cv2.VideoCapture(0)
 detector = handDetector(maxHands=1)
 
-folder = "Data/Bulgarian/5"
+folder = "Data/Bulgarian/9"
 counter = 0
 
 while True:
