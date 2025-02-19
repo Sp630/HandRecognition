@@ -24,7 +24,7 @@ cap = cv2.VideoCapture(0)
 detector = handDetector(maxHands=1)
 counter = 0
 #Load the model; done at the beginning to prevent slow-downs in the loop
-classifier = ClassificationModule.Classifier("Models/model4")
+classifier = ClassificationModule.Classifier("Models/model5")
 
 globalImage = None
 classes = ["A", "B", "C"]
