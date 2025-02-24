@@ -12,6 +12,7 @@ import tensorflow.keras.preprocessing as prep
 
 
 train_dataset = prep.image_dataset_from_directory(
+
     directory="Data/Bulgarian",
     image_size=(300, 300),
     validation_split=0.4,
@@ -64,15 +65,15 @@ model = tf.keras.models.Sequential([
     Dense(512, activation=relu),
     Dropout(0.2),
     Dense(256, activation=relu),
-    Dense(20, activation=softmax)
+    Dense(29, activation=softmax)
 
 ])
 
 
 model.compile(loss= CategoricalCrossentropy(), optimizer = Adam(), metrics = ['accuracy'])
 
-history = model.fit(train_dataset, epochs = 1, validation_data = test_dataset)
+history = model.fit(train_dataset, epochs = 2, validation_data = test_dataset)
 
-model.save("Models/model7")
+model.save("Models/model11")
 print("banana")
 

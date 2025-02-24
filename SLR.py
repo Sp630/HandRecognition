@@ -4,9 +4,9 @@ import tensorflow
 from tensorboard import summary
 from tensorflow.keras.models import *
 
-model = load_model("Models/model7")
+model = load_model("Models/model8")
 model.summary()
-imgPath = "Data/Bulgarian/19/Image_1739921920.4461687.jpg"
+imgPath = "Data/Testing captures/Image_1740244592.80069.jpg"
 img = cv2.imread(imgPath)
 
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

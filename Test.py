@@ -24,7 +24,7 @@ cap = cv2.VideoCapture(0)
 detector = handDetector(maxHands=1)
 counter = 0
 #Load the model; done at the beginning to prevent slow-downs in the loop
-classifier = ClassificationModule.Classifier("Models/model5")
+classifier = ClassificationModule.Classifier("Models/model11")
 
 globalImage = None
 classes = ["A", "B", "C"]
@@ -53,40 +53,40 @@ while True:
     imgSize = 300
     if classifier.result is not None:
         prediction = classifier.result
-        classes = ["А", "И'", "Б", "В", "Г", "Д", "Е", "Ж", "З", "И"]
-
+        classes = ["А", "И'", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "Б", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", "В", "Г", "Д", "E", "Ж", "З", "И"]
+        print(np.argmax(prediction))
         print(classes[np.argmax(prediction)])
+        print(prediction)
         pred = prediction
 
     if data:
         bbxmax, bbxmin, bbymax, bbymin = data["bbox"]
         w, h = bbxmax - bbxmin, bbymax - bbymin
-        cropImg = img[bbymin - bboffset : bbymax + bboffset, bbxmin - bboffset : bbxmax + bboffset]
+        cropImg = img[bbymin - bboffset: bbymax + bboffset, bbxmin - bboffset: bbxmax + bboffset]
         if cropImg is not None and cropImg.size != 0:
           cv2.imshow("CropedImage", cropImg)
 
         imgCropShape = cropImg.shape
-        imgWhite  = np.ones([imgSize, imgSize, 3], np.uint8)*255
-        #print(imgCropShape)
+        imgWhite = np.ones([imgSize, imgSize, 3], np.uint8) * 255
+        # print(imgCropShape)
 
         aspectRatio = h / w
 
         if aspectRatio > 1:
-            k = imgSize/h
-            wCal = math.ceil(k*w)
+            k = imgSize / h
+            wCal = math.ceil(k * w)
             imgResize = cv2.resize(cropImg, (wCal, imgSize))
             imgResizeShape = imgResize.shape
-            wGap = math.ceil(((300-wCal) / 2))
-            imgWhite[:, wGap:wCal+wGap] = imgResize
+            wGap = math.ceil(((300 - wCal) / 2))
+            imgWhite[:, wGap:wCal + wGap] = imgResize
             classifier.getPrediction(imgWhite)
-
         else:
-            k=imgSize/w
+            k = imgSize / w
             hCal = math.ceil(k * h)
             imgResize = cv2.resize(cropImg, (imgSize, hCal))
             imgResizeShape = imgResize.shape
             hGap = math.ceil(((300 - hCal) / 2))
-            imgWhite[hGap:hCal+hGap, :] = imgResize
+            imgWhite[hGap:hCal + hGap, :] = imgResize
             classifier.getPrediction(imgWhite)
 
 

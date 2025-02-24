@@ -9,8 +9,6 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import tensorflow.keras.preprocessing as prep
 
 
-train = ImageDataGenerator(rescale= 1/255)
-validation = ImageDataGenerator(rescale= 1/255)
 
 train_dataset = prep.image_dataset_from_directory(
     directory="Data/Bulgarian",
@@ -60,6 +58,6 @@ model.compile(loss= CategoricalCrossentropy(), optimizer = Adam(), metrics = ['a
 
 history = model.fit(train_dataset, epochs = 10, validation_data = test_dataset)
 
-model.save("Models/model5")
+model.save("Models/model8")
 print("banana")
 

@@ -12,6 +12,8 @@ class Classifier:
         self.modelPath = modelPath
         self.result = None
         self.lock = threading.Lock()
+        self.model = load_model(self.modelPath)
+
     def multithreadPredict(self, img):
         t1 = threading.Thread(target=self.getPrediction, args=(img, ))
         t1.start()
@@ -20,11 +22,10 @@ class Classifier:
         #img = cv2.imread(self.imgPath)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        img = img / 255
+        #img = img / 255
         img = np.expand_dims(img, axis=0)
         classes = ["A", "B", "C"]
-        model = load_model(self.modelPath)
-        prediction = model.predict(img)
+        prediction = self.model.predict(img)
         self.result = 14
         with self.lock:
             self.result = prediction
