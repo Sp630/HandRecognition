@@ -7,6 +7,8 @@ from tensorflow.keras.losses import *
 from tensorflow.keras.optimizers import *
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import tensorflow.keras.preprocessing as prep
+from tensorflow.keras.callbacks import TensorBoard
+
 
 
 
@@ -69,11 +71,12 @@ model = tf.keras.models.Sequential([
 
 ])
 
+tensorboard_callback = TensorBoard(log_dir="C:\Sps things\Programing\PythonProjects\HandRecognition\Tensorboard\File1", histogram_freq=1)
 
 model.compile(loss= CategoricalCrossentropy(), optimizer = Adam(), metrics = ['accuracy'])
 
-history = model.fit(train_dataset, epochs = 2, validation_data = test_dataset)
+history = model.fit(train_dataset, epochs = 10, validation_data = test_dataset, callbacks=[tensorboard_callback])
 
-model.save("Models/model11")
+model.save("Models/model12")
 print("banana")
 

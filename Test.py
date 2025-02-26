@@ -1,3 +1,4 @@
+import sys
 import time
 import cv2
 import numpy as np
@@ -12,6 +13,9 @@ import os
 import gc
 import tensorflow.keras.backend as K
 import threading
+import tkinter as tk
+from PIL import Image, ImageTk
+
 
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -19,19 +23,81 @@ for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 #os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-#passtest
+#threading synchronization
+stop_event = threading.Event()
+sharedData = None
+dataLock = threading.Lock()
+
+
+#videoCapture
 cap = cv2.VideoCapture(0)
 detector = handDetector(maxHands=1)
 counter = 0
-#Load the model; done at the beginning to prevent slow-downs in the loop
+
+#GUI
+#Tkinter
+def CVtoTK(videoLabel, root, text):
+    success, img = cap.read()
+    if success:
+        data, img = detector.findHands(img)
+
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        wholeImg = Image.fromarray(img)
+        tkimage = ImageTk.PhotoImage(image = wholeImg)
+        videoLabel.tkimage = tkimage
+        videoLabel.config(image=tkimage)
+
+
+        with dataLock:
+            global sharedData
+            print(sharedData)
+            text.config(text= sharedData)
+
+    root.after(10, lambda: CVtoTK(videoLabel, root, text))
+
+def StartTkinter():
+    root = tk.Tk()
+    root.title("BGSLR")
+    root.geometry("800x800")
+    videoLabel = tk.Label(root)
+    videoLabel.pack()
+    text = tk.Label(root, font=("Arial", 30))
+    text.pack(side="top", pady=10);
+
+    quitButton = tk.Button(root,
+                           text="Излез",
+                           command= lambda: Quit(root),
+                           font= ("Arial", 14),
+                           width= 10,
+                           height= 5
+                           )
+    quitButton.pack(side="bottom", pady=10)
+
+    CVtoTK(videoLabel, root, text)
+    root.mainloop()
+def Quit(root):
+    stop_event .set()
+
+    #Ensure resources are properly released
+
+    root.quit()
+    root.destroy()
+    sys.exit()
+
+t2 = threading.Thread(target=StartTkinter)
+t2.start()
+
+#Load the model; done at the beginning to prevent slow-downs inside the loop
 classifier = ClassificationModule.Classifier("Models/model11")
 
 globalImage = None
 classes = ["A", "B", "C"]
 pred = None
 
+#use this if you don't want GUI
 def ShowVideo():
-    while True:
+
+
         success, img = cap.read()
         data, img = detector.findHands(img)
         globalImage = img
@@ -42,10 +108,12 @@ def ShowVideo():
         
 
 
-t1 = threading.Thread(target=ShowVideo)
-t1.start()
+#t1 = threading.Thread(target=ShowVideo, daemon= True)
+#t1.start()
 
-while True:
+
+
+while not stop_event.isSet():
     success, img = cap.read()
     data = None
     data, img = detector.findHands(img)
@@ -54,9 +122,10 @@ while True:
     if classifier.result is not None:
         prediction = classifier.result
         classes = ["А", "И'", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "Б", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", "В", "Г", "Д", "E", "Ж", "З", "И"]
-        print(np.argmax(prediction))
-        print(classes[np.argmax(prediction)])
-        print(prediction)
+        #print(np.argmax(prediction))
+        #print(classes[np.argmax(prediction)])
+        #print(prediction)
+        sharedData = classes[np.argmax(prediction)]
         pred = prediction
 
     if data:
@@ -93,3 +162,4 @@ while True:
         cv2.imshow("WhiteImage", imgWhite)
         #cv2.imshow("Image", img)
         key = cv2.waitKey(1)
+cap.release()
