@@ -17,7 +17,7 @@ class Classifier:
     def multithreadPredict(self, img):
         t1 = threading.Thread(target=self.getPrediction, args=(img, ))
         t1.start()
-        print(self.result)
+        #print(self.result)
     def getPrediction(self, img):
         #img = cv2.imread(self.imgPath)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

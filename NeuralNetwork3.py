@@ -8,6 +8,7 @@ from tensorflow.keras.optimizers import *
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import tensorflow.keras.preprocessing as prep
 from tensorflow.keras.callbacks import TensorBoard
+from tensorflow.keras.callbacks import ModelCheckpoint
 
 
 
@@ -67,16 +68,21 @@ model = tf.keras.models.Sequential([
     Dense(512, activation=relu),
     Dropout(0.2),
     Dense(256, activation=relu),
-    Dense(29, activation=softmax)
+    Dense(30, activation=softmax)
 
 ])
 
 tensorboard_callback = TensorBoard(log_dir="C:\Sps things\Programing\PythonProjects\HandRecognition\Tensorboard\File1", histogram_freq=1)
+checkpoint = ModelCheckpoint(
+    filepath= "Models/model13",
+    save_best_only= True,
+    monitor= "val_loss",
+    verbose= 1
+)
 
 model.compile(loss= CategoricalCrossentropy(), optimizer = Adam(), metrics = ['accuracy'])
 
-history = model.fit(train_dataset, epochs = 10, validation_data = test_dataset, callbacks=[tensorboard_callback])
+history = model.fit(train_dataset, epochs = 3, validation_data = test_dataset, callbacks=[tensorboard_callback, checkpoint])
 
-model.save("Models/model12")
 print("banana")
 

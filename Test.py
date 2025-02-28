@@ -2,6 +2,8 @@ import sys
 import time
 import cv2
 import numpy as np
+from numpy.f2py.crackfortran import word_pattern
+
 #from cvzone import HandTrackingModule
 from HandTrackingModule import handDetector
 import math
@@ -17,7 +19,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 
 
-
+#ensure proper usage of physical devices
 gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
@@ -26,17 +28,19 @@ for gpu in gpus:
 #threading synchronization
 stop_event = threading.Event()
 sharedData = None
+sharedCount = None
+globalText = ""
 dataLock = threading.Lock()
 
 
 #videoCapture
 cap = cv2.VideoCapture(0)
 detector = handDetector(maxHands=1)
-counter = 0
 
 #GUI
 #Tkinter
-def CVtoTK(videoLabel, root, text):
+counter = 0
+def CVtoTK(videoLabel, root, text, counterText, wordText):
     success, img = cap.read()
     if success:
         data, img = detector.findHands(img)
@@ -50,11 +54,20 @@ def CVtoTK(videoLabel, root, text):
 
         with dataLock:
             global sharedData
-            print(sharedData)
+            global counter
+            global globalText
+            #print(sharedData)
             text.config(text= sharedData)
+            counterText.config(text= "")
+            newText = ""
+            for i in range(counter):
+                newText += "*"
+            counterText.config(text= newText)
+            wordText.config(text= globalText)
 
-    root.after(10, lambda: CVtoTK(videoLabel, root, text))
+    root.after(10, lambda: CVtoTK(videoLabel, root, text, counterText, wordText))
 
+#A function which will start a separate thread
 def StartTkinter():
     root = tk.Tk()
     root.title("BGSLR")
@@ -62,18 +75,22 @@ def StartTkinter():
     videoLabel = tk.Label(root)
     videoLabel.pack()
     text = tk.Label(root, font=("Arial", 30))
-    text.pack(side="top", pady=10);
+    text.pack(side="top", pady=10)
+    counterText = tk.Label(root, font=("Arial", 30))
+    counterText.pack(side="top", pady=10)
+    wordText = tk.Label(root, font=("Arial", 30))
+    wordText.pack(side="top", pady=10)
 
     quitButton = tk.Button(root,
                            text="Излез",
                            command= lambda: Quit(root),
-                           font= ("Arial", 14),
+                           font= ("Roboto", 14),
                            width= 10,
                            height= 5
                            )
     quitButton.pack(side="bottom", pady=10)
 
-    CVtoTK(videoLabel, root, text)
+    CVtoTK(videoLabel, root, text, counterText, wordText)
     root.mainloop()
 def Quit(root):
     stop_event .set()
@@ -88,10 +105,9 @@ t2 = threading.Thread(target=StartTkinter)
 t2.start()
 
 #Load the model; done at the beginning to prevent slow-downs inside the loop
-classifier = ClassificationModule.Classifier("Models/model11")
+classifier = ClassificationModule.Classifier("Models/model13")
 
 globalImage = None
-classes = ["A", "B", "C"]
 pred = None
 
 #use this if you don't want GUI
@@ -112,7 +128,10 @@ def ShowVideo():
 #t1.start()
 
 
-
+#Text Control
+var = None
+counter = 0
+globalText = " "
 while not stop_event.isSet():
     success, img = cap.read()
     data = None
@@ -121,13 +140,27 @@ while not stop_event.isSet():
     imgSize = 300
     if classifier.result is not None:
         prediction = classifier.result
-        classes = ["А", "И'", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "Б", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", "В", "Г", "Д", "E", "Ж", "З", "И"]
+        classes = ["А", "И'", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "Б", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", "В", "", "Г", "Д", "E", "Ж", "З", "И"]
+        print(np.argmax(prediction))
+        if classes[np.argmax(prediction)] == var and counter >= 10:
+            if(np.argmax(prediction) == 23):
+                globalText = ""
+                print("Badabum")
+            else:
+                globalText = globalText + classes[np.argmax(prediction)]
+            counter = 0
+            var = classes[np.argmax(prediction)]
+        elif classes[np.argmax(prediction)] is not var:
+            var = classes[np.argmax(prediction)]
+            counter = 0
+        elif classes[np.argmax(prediction)] == var:
+            counter += 1
         #print(np.argmax(prediction))
         #print(classes[np.argmax(prediction)])
-        #print(prediction)
+        print(globalText)
         sharedData = classes[np.argmax(prediction)]
         pred = prediction
-
+#image recognition
     if data:
         bbxmax, bbxmin, bbymax, bbymin = data["bbox"]
         w, h = bbxmax - bbxmin, bbymax - bbymin
@@ -137,29 +170,31 @@ while not stop_event.isSet():
 
         imgCropShape = cropImg.shape
         imgWhite = np.ones([imgSize, imgSize, 3], np.uint8) * 255
-        # print(imgCropShape)
+        #Reshaping so that the model can use it
 
         aspectRatio = h / w
 
-        if aspectRatio > 1:
-            k = imgSize / h
-            wCal = math.ceil(k * w)
-            imgResize = cv2.resize(cropImg, (wCal, imgSize))
-            imgResizeShape = imgResize.shape
-            wGap = math.ceil(((300 - wCal) / 2))
-            imgWhite[:, wGap:wCal + wGap] = imgResize
-            classifier.getPrediction(imgWhite)
+        if cropImg.shape[0] < 300 and cropImg.shape[1] < 300 and cropImg is not None and cropImg.size != 0:
+
+            if aspectRatio > 1:
+                k = imgSize / h
+                wCal = math.ceil(k * w)
+                imgResize = cv2.resize(cropImg, (wCal, imgSize))
+                imgResizeShape = imgResize.shape
+                wGap = math.ceil(((300 - wCal) / 2))
+                imgWhite[:, wGap:wCal + wGap] = imgResize
+                classifier.getPrediction(imgWhite)
+            else:
+                k = imgSize / w
+                hCal = math.ceil(k * h)
+                imgResize = cv2.resize(cropImg, (imgSize, hCal))
+                imgResizeShape = imgResize.shape
+                hGap = math.ceil(((300 - hCal) / 2))
+                imgWhite[hGap:hCal + hGap, :] = imgResize
+                classifier.getPrediction(imgWhite)
+
         else:
-            k = imgSize / w
-            hCal = math.ceil(k * h)
-            imgResize = cv2.resize(cropImg, (imgSize, hCal))
-            imgResizeShape = imgResize.shape
-            hGap = math.ceil(((300 - hCal) / 2))
-            imgWhite[hGap:hCal + hGap, :] = imgResize
-            classifier.getPrediction(imgWhite)
-
-
+            sharedData = "Моля отдалечете се"
         cv2.imshow("WhiteImage", imgWhite)
-        #cv2.imshow("Image", img)
         key = cv2.waitKey(1)
 cap.release()

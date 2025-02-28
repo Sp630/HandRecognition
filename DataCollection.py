@@ -14,7 +14,7 @@ cap = cv2.VideoCapture(0)
 detector = handDetector(maxHands=1)
 
 #folder = "Data/Bulgarian/1"
-folder = "Data/Bulgarian/17"
+folder = "Data/Bulgarian/30"
 counter = 0
 
 while True:
