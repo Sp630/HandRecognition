@@ -7,7 +7,7 @@ from tensorflow.keras.losses import *
 from tensorflow.keras.optimizers import *
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.preprocessing import image
-
+#
 train = ImageDataGenerator(rescale= 1/255)
 validation = ImageDataGenerator(rescale= 1/255)
 
