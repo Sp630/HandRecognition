@@ -1,10 +1,9 @@
+#this file connects all the modules together
 import sys
 import time
 import cv2
 import numpy as np
-from numpy.f2py.crackfortran import word_pattern
 
-#from cvzone import HandTrackingModule
 from HandTrackingModule import handDetector
 import math
 import tensorflow as tf
@@ -140,12 +139,11 @@ while not stop_event.isSet():
     imgSize = 300
     if classifier.result is not None:
         prediction = classifier.result
-        classes = ["А", "И'", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "Б", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", "В", "", "Г", "Д", "E", "Ж", "З", "И"]
+        classes = ["А", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "Б", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", "В", "", "Г", "Д", "E", "Ж", "З", "И"]
         print(np.argmax(prediction))
         if classes[np.argmax(prediction)] == var and counter >= 10:
             if(np.argmax(prediction) == 23):
                 globalText = ""
-                print("Badabum")
             else:
                 globalText = globalText + classes[np.argmax(prediction)]
             counter = 0
@@ -174,7 +172,7 @@ while not stop_event.isSet():
 
         aspectRatio = h / w
 
-        if cropImg.shape[0] < 300 and cropImg.shape[1] < 300 and cropImg is not None and cropImg.size != 0:
+        if cropImg.shape[0] <= 300 and cropImg.shape[1] <= 300 and cropImg is not None and cropImg.size != 0:
 
             if aspectRatio > 1:
                 k = imgSize / h
@@ -182,19 +180,23 @@ while not stop_event.isSet():
                 imgResize = cv2.resize(cropImg, (wCal, imgSize))
                 imgResizeShape = imgResize.shape
                 wGap = math.ceil(((300 - wCal) / 2))
-                imgWhite[:, wGap:wCal + wGap] = imgResize
-                classifier.getPrediction(imgWhite)
+                if imgResize.shape[0] <= 300 and imgResize.shape[1] <= 300:
+                    imgWhite[:, wGap:wCal + wGap] = imgResize
+                    classifier.getPrediction(imgWhite)
             else:
                 k = imgSize / w
                 hCal = math.ceil(k * h)
                 imgResize = cv2.resize(cropImg, (imgSize, hCal))
                 imgResizeShape = imgResize.shape
                 hGap = math.ceil(((300 - hCal) / 2))
-                imgWhite[hGap:hCal + hGap, :] = imgResize
-                classifier.getPrediction(imgWhite)
+                if imgResize.shape[0] <= 300 and imgResize.shape[1] <= 300:
+
+                    imgWhite[hGap:hCal + hGap, :] = imgResize
+                    classifier.getPrediction(imgWhite)
 
         else:
             sharedData = "Моля отдалечете се"
         cv2.imshow("WhiteImage", imgWhite)
         key = cv2.waitKey(1)
+
 cap.release()

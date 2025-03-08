@@ -12,7 +12,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 
 
 
-
+#get data from disk, split data into training and validation sets
 
 train_dataset = prep.image_dataset_from_directory(
 
@@ -36,12 +36,12 @@ test_dataset = prep.image_dataset_from_directory(
     seed=1
 )
 
-
+#review classes
 print(train_dataset.class_names)
 
 print(test_dataset.class_names)
 
-
+#costruct the model
 model = tf.keras.models.Sequential([
     Input(shape=(300, 300, 3)),
     Conv2D(32, 3, activation= relu),
@@ -72,6 +72,7 @@ model = tf.keras.models.Sequential([
 
 ])
 
+#callbacks
 tensorboard_callback = TensorBoard(log_dir="C:\Sps things\Programing\PythonProjects\HandRecognition\Tensorboard\File1", histogram_freq=1)
 checkpoint = ModelCheckpoint(
     filepath= "Models/model13",
@@ -80,8 +81,10 @@ checkpoint = ModelCheckpoint(
     verbose= 1
 )
 
+#compile the model
 model.compile(loss= CategoricalCrossentropy(), optimizer = Adam(), metrics = ['accuracy'])
 
+#train for 3 epochs
 history = model.fit(train_dataset, epochs = 3, validation_data = test_dataset, callbacks=[tensorboard_callback, checkpoint])
 
 print("banana")

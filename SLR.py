@@ -1,3 +1,5 @@
+#a file which tests the model on already collected images
+#intended to be used before real time testing
 import cv2
 import numpy as np
 import tensorflow

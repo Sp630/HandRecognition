@@ -11,19 +11,21 @@ from tensorflow.keras.models import *
 
 
 cap = cv2.VideoCapture(0)
+#use HandTrackingModule
 detector = handDetector(maxHands=1)
 
 #folder = "Data/Bulgarian/1"
 folder = "Data/Bulgarian/30"
 counter = 0
 
+#create a loop and use the camera
 while True:
     success, img = cap.read()
     data, img = detector.findHands(img)
     bboffset = 20
     imgSize = 300
 
-
+    #use the output provided by HandTrackingModule
     if data:
         bbxmax, bbxmin, bbymax, bbymin = data["bbox"]
         w, h = bbxmax - bbxmin, bbymax - bbymin
@@ -35,6 +37,7 @@ while True:
         imgWhite  = np.ones([imgSize, imgSize, 3], np.uint8)*255
         #print(imgCropShape)
 
+        #prepare the image in the correct format
         aspectRatio = h / w
 
         if aspectRatio > 1:
@@ -55,7 +58,7 @@ while True:
 
         cv2.imshow("WhiteImage", imgWhite)
 
-
+    #save show the image
     cv2.imshow("Image", img)
     key = cv2.waitKey(1)
     if key == ord("s"):

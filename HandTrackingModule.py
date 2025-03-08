@@ -4,7 +4,7 @@ import time
 
 from tensorflow.python.keras.activations import relu6
 
-
+#this class is responsible for finding hands and outputting information about their landmarks
 class handDetector():
     def __init__(self, mode=False, maxHands=2, modelComplexity = 1, detectionCon=0.5, trackCon=0.5):
         self.mode = mode
@@ -16,6 +16,7 @@ class handDetector():
         self.mpHands = mp.solutions.hands
         self.hands = self.mpHands.Hands(self.mode, self.maxHands, self.modelComplexity, self.detectionCon, self.trackCon)
         self.mpDraw = mp.solutions.drawing_utils
+
 
     def findHands(self, img, handNo = 0, draw=True):
         img = cv2.flip(img, 1)
@@ -68,7 +69,7 @@ class handDetector():
 
         return lmList
 
-
+#testing
 def main():
     cap = cv2.VideoCapture(0)
     detector = handDetector(maxHands=1)
