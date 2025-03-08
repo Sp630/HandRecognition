@@ -40,6 +40,7 @@ while True:
         #prepare the image in the correct format
         aspectRatio = h / w
 
+        #resize so that all images have the same shape --> important for the CNN
         if aspectRatio > 1:
             k = imgSize/h
             wCal = math.ceil(k*w)

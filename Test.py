@@ -3,7 +3,6 @@ import sys
 import time
 import cv2
 import numpy as np
-
 from HandTrackingModule import handDetector
 import math
 import tensorflow as tf

@@ -51,7 +51,6 @@ class handDetector():
                     self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS)
                     offset = 10
                     cv2.rectangle(img, [xmin - offset, ymin - offset], [xmax + offset, ymax + offset], (255, 0, 0), 3)
-        #totalHand["lm"] = [0, 1, 2]
         return  totalHand, img
 
     def findPosition(self, img, handNo=0, draw = False):

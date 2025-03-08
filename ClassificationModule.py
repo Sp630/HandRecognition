@@ -22,7 +22,7 @@ class Classifier:
         #img = cv2.imread(self.imgPath)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        #img = img / 255
+        ##img = img / 255
         img = np.expand_dims(img, axis=0)
         classes = ["A", "B", "C"]
         prediction = self.model.predict(img)

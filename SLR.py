@@ -1,5 +1,6 @@
 #a file which tests the model on already collected images
-#intended to be used before real time testing
+#intended to be used before real time testing in case of wierd results
+#it was used to debug differences in the way data was processed before training and then before testing
 import cv2
 import numpy as np
 import tensorflow

@@ -1,4 +1,4 @@
-#This is a testing file
+#This file is for testing purposes
 import mediapipe as mp
 import cv2
 import time

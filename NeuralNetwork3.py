@@ -84,7 +84,7 @@ checkpoint = ModelCheckpoint(
 #compile the model
 model.compile(loss= CategoricalCrossentropy(), optimizer = Adam(), metrics = ['accuracy'])
 
-#train for 3 epochs
+#train for 3 epochs/iterations
 history = model.fit(train_dataset, epochs = 3, validation_data = test_dataset, callbacks=[tensorboard_callback, checkpoint])
 
 print("banana")

@@ -1,4 +1,4 @@
-#An extra file for testing purposes
+#this file is for testing purposes
 import cv2
 import numpy as np
 import tensorflow as tf
