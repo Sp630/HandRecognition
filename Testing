@@ -3,6 +3,8 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 
+#This file is officially not a .py file. Wierd, to be investigated.
+
 # Load model
 model = load_model("Models/model5")
 model.summary()
