@@ -103,7 +103,7 @@ t2 = threading.Thread(target=StartTkinter)
 t2.start()
 
 #Load the model; done at the beginning to prevent slow-downs inside the loop
-classifier = ClassificationModule.Classifier("Models/model13")
+classifier = ClassificationModule.Classifier("Models/model15")
 
 globalImage = None
 pred = None
@@ -128,9 +128,11 @@ def ShowVideo():
 
 #Text Control
 var = None
+handIsInFrame = False
 counter = 0
 globalText = " "
 while not stop_event.isSet():
+    print(handIsInFrame)
     success, img = cap.read()
     data = None
     data, img = detector.findHands(img)
@@ -138,10 +140,11 @@ while not stop_event.isSet():
     imgSize = 300
     if classifier.result is not None:
         prediction = classifier.result
-        classes = ["А", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "Б", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", "В", "", "Г", "Д", "E", "Ж", "З", "И"]
-        print(np.argmax(prediction))
+        #classes = ["А", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "Б", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", "В", "", "Г", "Д", "E", "Ж", "З", "И"]
+        classes = ["А","Б", "В", "Г", "Д", "E", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", ""]
+        #print(np.argmax(prediction))
         if classes[np.argmax(prediction)] == var and counter >= 10:
-            if(np.argmax(prediction) == 23):
+            if(np.argmax(prediction) == 29):
                 globalText = ""
             else:
                 globalText = globalText + classes[np.argmax(prediction)]
@@ -150,15 +153,16 @@ while not stop_event.isSet():
         elif classes[np.argmax(prediction)] is not var:
             var = classes[np.argmax(prediction)]
             counter = 0
-        elif classes[np.argmax(prediction)] == var:
+        elif classes[np.argmax(prediction)] == var and handIsInFrame:
             counter += 1
         #print(np.argmax(prediction))
         #print(classes[np.argmax(prediction)])
-        print(globalText)
+        #print(globalText)
         sharedData = classes[np.argmax(prediction)]
         pred = prediction
 #image recognition
     if data:
+        handIsInFrame = True
         bbxmax, bbxmin, bbymax, bbymin = data["bbox"]
         w, h = bbxmax - bbxmin, bbymax - bbymin
         cropImg = img[bbymin - bboffset: bbymax + bboffset, bbxmin - bboffset: bbxmax + bboffset]
@@ -197,5 +201,8 @@ while not stop_event.isSet():
             sharedData = "Моля отдалечете се"
         cv2.imshow("WhiteImage", imgWhite)
         key = cv2.waitKey(1)
+    else:
+        handIsInFrame = False
+
 
 cap.release()

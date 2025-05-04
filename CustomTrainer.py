@@ -10,13 +10,23 @@ import tensorflow.keras.preprocessing as prep
 from tensorflow.keras.callbacks import TensorBoard
 from tensorflow.keras.callbacks import ModelCheckpoint
 
+import DataCollection
+
+let = 1
+while let != 4:
+    print(f"Let is {let}")
+    DataCollection.CollectImages(f"Data/Testing/{let}", 400, 1)
+    let += 1
+    print(f"Let is {let}")
+
+# <editor-fold desc="Model">
 
 
 #get data from disk, split data into training and validation sets
 
 train_dataset = prep.image_dataset_from_directory(
 
-    directory="Data/Bulgarian",
+    directory="Data/Testing",
     image_size=(300, 300),
     validation_split=0.4,
     subset= "training",
@@ -27,7 +37,7 @@ train_dataset = prep.image_dataset_from_directory(
 )
 
 test_dataset = prep.image_dataset_from_directory(
-    directory="Data/Bulgarian",
+    directory="Data/Testing",
     image_size=(300, 300),
     validation_split=0.4,
     subset= "validation",
@@ -68,14 +78,14 @@ model = tf.keras.models.Sequential([
     Dense(512, activation=relu),
     Dropout(0.2),
     Dense(256, activation=relu),
-    Dense(30, activation=softmax)
+    Dense(let - 1, activation=softmax)
 
 ])
 
 #callbacks
 tensorboard_callback = TensorBoard(log_dir="C:\Sps things\Programing\PythonProjects\HandRecognition\Tensorboard\File1", histogram_freq=1)
 checkpoint = ModelCheckpoint(
-    filepath= "Models/model16",
+    filepath= "Models/model15",
     save_best_only= True,
     monitor= "val_loss",
     verbose= 1
@@ -83,9 +93,10 @@ checkpoint = ModelCheckpoint(
 
 #compile the model
 model.compile(loss= CategoricalCrossentropy(), optimizer = Adam(), metrics = ['accuracy'])
+# </editor-fold>
 
 #train for 3 epochs/iterations
-history = model.fit(train_dataset, epochs = 3, validation_data = test_dataset, callbacks=[tensorboard_callback, checkpoint])
+history = model.fit(train_dataset, epochs = 3, validation_data = test_dataset, callbacks=[checkpoint])
 
-print("banana")
+print("orange")
 
