@@ -10,6 +10,5 @@ import tensorflow.keras.preprocessing as prep
 from tensorflow.keras.callbacks import TensorBoard
 from tensorflow.keras.callbacks import ModelCheckpoint
 
-model = tf.keras.models.load_model("Models/model13")
-
-print(model.summary())
+import tensorflow as tf
+print(tf.__version__)

@@ -65,7 +65,7 @@ def CVtoTK(videoLabel, root, text, counterText, wordText):
 
     root.after(10, lambda: CVtoTK(videoLabel, root, text, counterText, wordText))
 
-#A function which will start a separate thread
+
 def StartTkinter():
     root = tk.Tk()
     root.title("BGSLR")
