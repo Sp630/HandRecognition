@@ -53,7 +53,7 @@ counter = 0
 # Text Control
 def TextControl():
     # Load the model; done at the beginning to prevent slow-downs inside the loop
-    classifier = ClassificationModule.Classifier("Models/model15")
+    classifier = ClassificationModule.Classifier("Models/model13")
     global sharedData, counter, globalText
     var = "None"
     handIsInFrame = False
@@ -68,13 +68,13 @@ def TextControl():
         imgSize = 300
         if classifier.result is not None:
             prediction = classifier.result
-            # classes = ["А", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "Б", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", "В", "", "Г", "Д", "E", "Ж", "З", "И"]
-            classes = ["А", "Б", "В", "Г", "Д", "E", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У",
-                       "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", ""]
+            classes = ["А", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "Б", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", "В", "", "Г", "Д", "E", "Ж", "З", "И"]
+            #classes = ["А", "Б", "В", "Г", "Д", "E", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У",
+            #           "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", ""]
             # print(np.argmax(prediction))
             with dataLock:
                 if classes[np.argmax(prediction)] == var and counter >= 10:
-                    if (np.argmax(prediction) == 29):
+                    if (np.argmax(prediction) == 23):
                         globalText = ""
                     else:
                         globalText = globalText + classes[np.argmax(prediction)]
@@ -139,20 +139,20 @@ class MainLayout(BoxLayout):
 
         self.video_label = Image(allow_stretch=True, keep_ratio=True, size_hint=(1, 0.85))
         self.add_widget(self.video_label)
-        #
-        # self.text = Label(text= "text", font_size=30)
-        # self.add_widget(self.text)
-        #
-        # self.counter_text = Label(text= "counter-text", font_size=30)
-        # self.add_widget(self.counter_text)
-        #
-        # self.word_text = Label(text= "word_text",font_size=30)
-        # self.add_widget(self.word_text)
-        #
-        # self.quit_button = Button(text="Излез", size_hint=(1, 0.15), font_size=20)
-        # self.quit_button.bind(on_press=self.quit_app)
-        # self.add_widget(self.quit_button)
-        #
+
+        self.text = Label(text= "text", font_size=30)
+        self.add_widget(self.text)
+
+        self.counter_text = Label(text= "counter-text", font_size=30)
+        self.add_widget(self.counter_text)
+
+        self.word_text = Label(text= "word_text",font_size=30)
+        self.add_widget(self.word_text)
+
+        self.quit_button = Button(text="Излез", size_hint=(1, 0.15), font_size=20)
+        self.quit_button.bind(on_press=self.quit_app)
+        self.add_widget(self.quit_button)
+
         # Start the CV processing loop
 
         red_img = np.ones((480, 640, 3), dtype=np.uint8) * np.array([0, 0, 255], dtype=np.uint8)  # Pure red
@@ -163,35 +163,32 @@ class MainLayout(BoxLayout):
         threading.Thread(target=self.cv_loop, daemon=True).start()
 
     @mainthread
-    def updateTexture(self):
-        red_img = np.ones((480, 640, 3), dtype=np.uint8) * np.array([255, 0, 0], dtype=np.uint8)  # Pure red
+    def updateTexture(self, red_img):
+
         red_buf = red_img.tobytes()
         red_texture = Texture.create(size=(640, 480), colorfmt='rgb')
         red_texture.blit_buffer(red_buf, colorfmt='rgb', bufferfmt='ubyte')
         self.video_label.texture = red_texture
 
     def cv_loop(self):
-        time.sleep(3)
-        self.updateTexture()
-        # red_img = np.ones((480, 640, 3), dtype=np.uint8) * np.array([255, 0, 0], dtype=np.uint8)  # Pure red
-        # red_buf = red_img.tobytes()
-        # red_texture = Texture.create(size=(640, 480), colorfmt='rgb')
-        # red_texture.blit_buffer(red_buf, colorfmt='rgb', bufferfmt='ubyte')
-        # self.video_label.texture = red_texture
-        #Clock.schedule_once(lambda dt: self.video_label.setter('texture')(self.video_label, red_texture))
 
-        # global sharedData, counter, globalText
-        #
-        # while not stop_event.is_set():
-        #     success, img = cap.read()
-        #     if not success:
-        #         continue
-        #
-        #     print("We made it, we have success = True, now what?")
-        #     # data, img = detector.findHands(img)
-        #     # img = cv2.flip(img, 1)
-        #     # img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        #     #
+
+
+        global sharedData, counter, globalText
+
+        while not stop_event.is_set():
+            success, img = cap.read()
+            if not success:
+                continue
+
+
+              #print("We made it, we have success = True, now what?")
+            data, img = detector.findHands(img)
+            img = cv2.flip(img, 0)
+            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            red_img = np.ones((480, 640, 3), dtype=np.uint8) * np.array([255, 0, 0], dtype=np.uint8)  # Pure red
+            self.updateTexture(img_rgb)
+
         #     # # Convert to texture for Kivy
         #     # buf = img_rgb.tobytes()
         #     # texture = Texture.create(size=(img.shape[1], img.shape[0]), colorfmt='rgb')
@@ -205,12 +202,12 @@ class MainLayout(BoxLayout):
         #     Clock.schedule_once(lambda dt: self.video_label.setter('texture')(self.video_label, red_texture))
         #     # Update Kivy UI from main thread
         #     #Clock.schedule_once(lambda dt, tex=texture: self.video_label.setter('texture')(self.video_label, tex))
-        #     # with dataLock:
-        #     #     # Update label texts
-        #     #     Clock.schedule_once(lambda dt: self.text.setter('text')(self.text, sharedData))
-        #     #     Clock.schedule_once(lambda dt: self.counter_text.setter('text')(self.counter_text, '*' * counter))
-        #     #     Clock.schedule_once(lambda dt: self.word_text.setter('text')(self.word_text, globalText))
-        #
+            with dataLock:
+                # Update label texts
+                Clock.schedule_once(lambda dt: self.text.setter('text')(self.text, sharedData))
+                Clock.schedule_once(lambda dt: self.counter_text.setter('text')(self.counter_text, '*' * counter))
+                Clock.schedule_once(lambda dt: self.word_text.setter('text')(self.word_text, globalText))
+
         #     #cv2.waitKey(10)
 
     def quit_app(self, instance):
