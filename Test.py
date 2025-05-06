@@ -3,6 +3,8 @@ import sys
 import time
 import cv2
 import numpy as np
+from docutils.nodes import classifier
+
 from HandTrackingModule import handDetector
 import math
 import tensorflow as tf
@@ -15,12 +17,13 @@ import tensorflow.keras.backend as K
 import threading
 import tkinter as tk
 from PIL import Image, ImageTk
+import CustomTrainer
 
 
 #ensure proper usage of physical devices
 gpus = tf.config.experimental.list_physical_devices('GPU')
-for gpu in gpus:
-    tf.config.experimental.set_memory_growth(gpu, True)
+# for gpu in gpus:
+#     tf.config.experimental.set_memory_growth(gpu, True)
 #os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 #threading synchronization
@@ -29,7 +32,8 @@ sharedData = None
 sharedCount = None
 globalText = ""
 dataLock = threading.Lock()
-
+useCustomModel = False
+classifier = ClassificationModule.Classifier("Models/model13")
 
 #videoCapture
 cap = cv2.VideoCapture(0)
@@ -79,14 +83,27 @@ def StartTkinter():
     wordText = tk.Label(root, font=("Arial", 30))
     wordText.pack(side="top", pady=10)
 
-    quitButton = tk.Button(root,
+    bottomFrame = tk.Frame(root)
+    bottomFrame.pack(side="bottom", pady=10)
+    quitButton = tk.Button(bottomFrame,
                            text="Излез",
-                           command= lambda: Quit(root),
-                           font= ("Roboto", 14),
-                           width= 10,
-                           height= 5
+                           command=lambda: Quit(root),
+                           font=("Roboto", 14),
+                           width=10,
+                           height=5
                            )
-    quitButton.pack(side="bottom", pady=10)
+    quitButton.pack(side="right", padx=5)
+
+    switchButton = tk.Button(bottomFrame,
+                             text="Смени Модел",
+                             command=lambda: SwitchModel(),
+                             font=("Roboto", 14),
+                             width=15,
+                             height=5
+                             )
+    switchButton.pack(side="left", padx=5)
+
+
 
     CVtoTK(videoLabel, root, text, counterText, wordText)
     root.mainloop()
@@ -99,11 +116,26 @@ def Quit(root):
     root.destroy()
     sys.exit()
 
+def SwitchModel():
+    global useCustomModel
+    global classifier
+    CustomTrainer
+    if(useCustomModel == True):
+        classifier = ClassificationModule.Classifier("Models/model13")
+        useCustomModel = False
+    else:
+        classifier = ClassificationModule.Classifier("Models/model15")
+        useCustomModel = True
+
+
 t2 = threading.Thread(target=StartTkinter)
 t2.start()
 
 #Load the model; done at the beginning to prevent slow-downs inside the loop
-classifier = ClassificationModule.Classifier("Models/model15")
+# if(useCustomModel):
+#     classifier = ClassificationModule.Classifier("Models/model15")
+# else:
+#     classifier = ClassificationModule.Classifier("Models/model13")
 
 globalImage = None
 pred = None
@@ -131,20 +163,34 @@ var = None
 handIsInFrame = False
 counter = 0
 globalText = " "
+currentModel = "general"
+if(useCustomModel):
+    currentModel = "custom"
 while not stop_event.isSet():
-    print(handIsInFrame)
+    # if(useCustomModel == False and currentModel == "custom"):
+    #     classifier = ClassificationModule.Classifier("Models/model13")
+    # elif(useCustomModel == True and currentModel == "general"):
+    #     classifier = ClassificationModule.Classifier("Models/model15")
+
+    print(classifier.modelPath)
     success, img = cap.read()
     data = None
     data, img = detector.findHands(img)
     bboffset = 20
     imgSize = 300
+    customSign = 23
     if classifier.result is not None:
         prediction = classifier.result
-        #classes = ["А", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "Б", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", "В", "", "Г", "Д", "E", "Ж", "З", "И"]
-        classes = ["А","Б", "В", "Г", "Д", "E", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", ""]
+        if useCustomModel:
+            classes = ["А", "Б", "В", "Г", "Д", "E", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т",
+                       "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", ""]
+            customSign = 29
+        else:
+            classes = ["А", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "Б", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ю", "Я", "В", "", "Г", "Д", "E", "Ж", "З", "И"]
+            customSign = 23
         #print(np.argmax(prediction))
         if classes[np.argmax(prediction)] == var and counter >= 10:
-            if(np.argmax(prediction) == 29):
+            if(np.argmax(prediction) == customSign):
                 globalText = ""
             else:
                 globalText = globalText + classes[np.argmax(prediction)]

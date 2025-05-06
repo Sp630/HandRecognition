@@ -9,13 +9,19 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import tensorflow.keras.preprocessing as prep
 from tensorflow.keras.callbacks import TensorBoard
 from tensorflow.keras.callbacks import ModelCheckpoint
+from pathlib import Path
+import shutil
 
 import DataCollection
 
+parentDir = Path("Data/Testing")
+if parentDir.exists() and parentDir.is_dir():
+    shutil.rmtree(parentDir)
+
 let = 1
-while let != 4:
+while let != 5:
     print(f"Let is {let}")
-    DataCollection.CollectImages(f"Data/Testing/{let}", 400, 1)
+    DataCollection.CollectImages(f"Data/Testing/{let}", 10, 1)
     let += 1
     print(f"Let is {let}")
 
@@ -23,7 +29,7 @@ while let != 4:
 
 
 #get data from disk, split data into training and validation sets
-
+print(let)
 train_dataset = prep.image_dataset_from_directory(
 
     directory="Data/Testing",
@@ -85,7 +91,7 @@ model = tf.keras.models.Sequential([
 #callbacks
 tensorboard_callback = TensorBoard(log_dir="C:\Sps things\Programing\PythonProjects\HandRecognition\Tensorboard\File1", histogram_freq=1)
 checkpoint = ModelCheckpoint(
-    filepath= "Models/model15",
+    filepath= "Models/CustomModels/model1",
     save_best_only= True,
     monitor= "val_loss",
     verbose= 1
