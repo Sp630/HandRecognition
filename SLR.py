@@ -11,7 +11,7 @@ model = load_model("Models/model8")
 model.summary()
 imgPath = "Data/Testing captures/Image_1740244592.80069.jpg"
 img = cv2.imread(imgPath)
-
+print(img.dtype)
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
 #img = img / 255

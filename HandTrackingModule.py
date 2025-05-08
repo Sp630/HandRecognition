@@ -20,6 +20,7 @@ class handDetector():
 
     def findHands(self, img, handNo = 0, draw=True):
         img = cv2.flip(img, 1)
+
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imgRGB)
         lmList = []

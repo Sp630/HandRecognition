@@ -10,5 +10,7 @@ import tensorflow.keras.preprocessing as prep
 from tensorflow.keras.callbacks import TensorBoard
 from tensorflow.keras.callbacks import ModelCheckpoint
 
-import tensorflow as tf
-print(tf.__version__)
+from tensorflow.python.platform import build_info
+
+print("TensorFlow CUDA build information:")
+print("cuDNN version: ", build_info)

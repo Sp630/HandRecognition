@@ -4,6 +4,7 @@ import time
 import cv2
 import numpy as np
 from docutils.nodes import classifier
+from numpy.lib.polynomial import roots
 
 from HandTrackingModule import handDetector
 import math
@@ -21,10 +22,12 @@ import CustomTrainer
 
 
 #ensure proper usage of physical devices
-gpus = tf.config.experimental.list_physical_devices('GPU')
+# gpus = tf.config.experimental.list_physical_devices('GPU')
 # for gpu in gpus:
 #     tf.config.experimental.set_memory_growth(gpu, True)
-#os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+CustomTrainer.StartCustomTrainer()
 
 #threading synchronization
 stop_event = threading.Event()
@@ -105,6 +108,8 @@ def StartTkinter():
 
 
 
+
+
     CVtoTK(videoLabel, root, text, counterText, wordText)
     root.mainloop()
 def Quit(root):
@@ -119,13 +124,19 @@ def Quit(root):
 def SwitchModel():
     global useCustomModel
     global classifier
-    CustomTrainer
     if(useCustomModel == True):
         classifier = ClassificationModule.Classifier("Models/model13")
         useCustomModel = False
     else:
-        classifier = ClassificationModule.Classifier("Models/model15")
+        classifier = ClassificationModule.Classifier("Models/CustomModels/model1")
         useCustomModel = True
+
+
+def Train(root):
+    t3 = threading.Thread(target=CustomTrainer.Train)
+    t3.start()
+    root.quit()
+    root.destroy()
 
 
 t2 = threading.Thread(target=StartTkinter)
@@ -172,7 +183,6 @@ while not stop_event.isSet():
     # elif(useCustomModel == True and currentModel == "general"):
     #     classifier = ClassificationModule.Classifier("Models/model15")
 
-    print(classifier.modelPath)
     success, img = cap.read()
     data = None
     data, img = detector.findHands(img)

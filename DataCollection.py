@@ -12,6 +12,7 @@ from pathlib import Path
 
 
 
+
 cap = cv2.VideoCapture(0)
 #use HandTrackingModule
 detector = handDetector(maxHands=1)
@@ -48,24 +49,25 @@ def CollectImages(directory, num, let):
             #prepare the image in the correct format
             aspectRatio = h / w
 
+            if cropImg is not None and cropImg.size != 0 and cropImg.shape[0] <= 300 and cropImg.shape[1] <= 300:
             #resize so that all images have the same shape --> important for the CNN
-            if aspectRatio > 1:
-                k = imgSize/h
-                wCal = math.ceil(k*w)
-                imgResize = cv2.resize(cropImg, (wCal, imgSize))
-                imgResizeShape = imgResize.shape
-                wGap = math.ceil(((300-wCal) / 2))
-                imgWhite[:, wGap:wCal+wGap] = imgResize
-            else:
-                k=imgSize/w
-                hCal = math.ceil(k * h)
-                imgResize = cv2.resize(cropImg, (imgSize, hCal))
-                imgResizeShape = imgResize.shape
-                hGap = math.ceil(((300 - hCal) / 2))
-                imgWhite[hGap:hCal+hGap, :] = imgResize
+                if aspectRatio > 1:
+                    k = imgSize/h
+                    wCal = math.ceil(k*w)
+                    imgResize = cv2.resize(cropImg, (wCal, imgSize))
+                    imgResizeShape = imgResize.shape
+                    wGap = math.ceil(((300-wCal) / 2))
+                    imgWhite[:, wGap:wCal+wGap] = imgResize
+                else:
+                    k=imgSize/w
+                    hCal = math.ceil(k * h)
+                    imgResize = cv2.resize(cropImg, (imgSize, hCal))
+                    imgResizeShape = imgResize.shape
+                    hGap = math.ceil(((300 - hCal) / 2))
+                    imgWhite[hGap:hCal+hGap, :] = imgResize
 
 
-            cv2.imshow("WhiteImage", imgWhite)
+                cv2.imshow("WhiteImage", imgWhite)
 
         #save show the image
         cv2.imshow("Image", img)
@@ -74,5 +76,5 @@ def CollectImages(directory, num, let):
             counter += 1
             cv2.imwrite(f"{directory}/Image_{time.time()}.jpg", imgWhite)
             print(counter)
-    return let + 1
+    return counter
 
